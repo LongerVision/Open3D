@@ -7,7 +7,7 @@
 
 #include "open3d/visualization/visualizer/VisualizerWithEditing.h"
 
-#include <tinyfiledialogs/tinyfiledialogs.h>
+#include <tinyfiledialogs.h>
 
 #include "open3d/geometry/Image.h"
 #include "open3d/geometry/LineSet.h"
