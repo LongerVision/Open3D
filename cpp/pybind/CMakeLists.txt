@@ -6,6 +6,8 @@ endif()
 set(PYTHON_VERSION "${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}")
 
 
+list(APPEND CMAKE_PREFIX_PATH "/home/lvision/.local/lib/python3.12/site-packages/pybind11/share/cmake/pybind11")
+find_package(pybind11 REQUIRED)
 pybind11_add_module(pybind)
 
 add_subdirectory(camera)
@@ -106,6 +108,7 @@ endif()
 # Include additional libraries that may be absent from the user system
 # eg: libc++.so, libc++abi.so (needed by filament) for Linux.
 # libc++.so is a linker script including libc++.so.1 and libc++abi.so, so append 1 to libc++.so
+find_package(TBB REQUIRED)
 set(PYTHON_EXTRA_LIBRARIES $<TARGET_FILE:TBB::tbb>)
 if (BUILD_GUI AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PYTHON_EXTRA_LIBRARIES ${CPP_LIBRARY}.1 ${CPPABI_LIBRARY})
@@ -218,35 +221,40 @@ file(GENERATE
     INPUT "${CMAKE_BINARY_DIR}/lib/_build_config.py.in"
 )
 
-add_custom_target(python-package
-    COMMAND ${CMAKE_COMMAND}
-            -DPYTHON_PACKAGE_SRC_DIR=${PYTHON_PACKAGE_SRC_DIR}
-            -DPYTHON_PACKAGE_DST_DIR=${PYTHON_PACKAGE_DST_DIR}
-            -DPYTHON_COMPILED_MODULE_DIR=${PYTHON_COMPILED_MODULE_DIR}
-            -DPYTHON_VERSION=${PYTHON_VERSION}
-            "-DCOMPILED_MODULE_PATH_LIST=${COMPILED_MODULE_PATH_LIST}"
-            "-DPYTHON_EXTRA_LIBRARIES=${PYTHON_EXTRA_LIBRARIES}"
-            -DBUILD_JUPYTER_EXTENSION=${BUILD_JUPYTER_EXTENSION}
-            -DBUILD_TENSORFLOW_OPS=${BUILD_TENSORFLOW_OPS}
-            -DBUILD_PYTORCH_OPS=${BUILD_PYTORCH_OPS}
-            -DBUNDLE_OPEN3D_ML=${BUNDLE_OPEN3D_ML}
-            -DOPEN3D_ML_ROOT=${OPEN3D_ML_ROOT}
-            -DBUILD_GUI=${BUILD_GUI}
-            -DBUILD_CUDA_MODULE=${BUILD_CUDA_MODULE}
-            -DGUI_RESOURCE_DIR=${GUI_RESOURCE_DIR}
-            -DPROJECT_EMAIL=${PROJECT_EMAIL}
-            -DPROJECT_HOMEPAGE_URL=${PROJECT_HOMEPAGE_URL}
-            -DPROJECT_DOCS=${PROJECT_DOCS}
-            -DPROJECT_CODE=${PROJECT_CODE}
-            -DPROJECT_ISSUES=${PROJECT_ISSUES}
-            -DPROJECT_VERSION=${OPEN3D_VERSION_FULL}
-            -DPROJECT_DESCRIPTION=${PROJECT_DESCRIPTION}
-            -DPROJECT_VERSION_THREE_NUMBER=${PROJECT_VERSION_THREE_NUMBER}
-            -DPYPI_PACKAGE_NAME=${PYPI_PACKAGE_NAME}
-            -P ${CMAKE_CURRENT_SOURCE_DIR}/make_python_package.cmake
-    VERBATIM
-    DEPENDS ${GENERATED_OUTPUTS}
-)
+if (TARGET TBB::tbb)
+    message(STATUS "TBB::tbb target is found. Python package will be built.")
+    add_custom_target(python-package
+        COMMAND ${CMAKE_COMMAND}
+                -DPYTHON_PACKAGE_SRC_DIR=${PYTHON_PACKAGE_SRC_DIR}
+                -DPYTHON_PACKAGE_DST_DIR=${PYTHON_PACKAGE_DST_DIR}
+                -DPYTHON_COMPILED_MODULE_DIR=${PYTHON_COMPILED_MODULE_DIR}
+                -DPYTHON_VERSION=${PYTHON_VERSION}
+                "-DCOMPILED_MODULE_PATH_LIST=${COMPILED_MODULE_PATH_LIST}"
+                "-DPYTHON_EXTRA_LIBRARIES=${PYTHON_EXTRA_LIBRARIES}"
+                -DBUILD_JUPYTER_EXTENSION=${BUILD_JUPYTER_EXTENSION}
+                -DBUILD_TENSORFLOW_OPS=${BUILD_TENSORFLOW_OPS}
+                -DBUILD_PYTORCH_OPS=${BUILD_PYTORCH_OPS}
+                -DBUNDLE_OPEN3D_ML=${BUNDLE_OPEN3D_ML}
+                -DOPEN3D_ML_ROOT=${OPEN3D_ML_ROOT}
+                -DBUILD_GUI=${BUILD_GUI}
+                -DBUILD_CUDA_MODULE=${BUILD_CUDA_MODULE}
+                -DGUI_RESOURCE_DIR=${GUI_RESOURCE_DIR}
+                -DPROJECT_EMAIL=${PROJECT_EMAIL}
+                -DPROJECT_HOMEPAGE_URL=${PROJECT_HOMEPAGE_URL}
+                -DPROJECT_DOCS=${PROJECT_DOCS}
+                -DPROJECT_CODE=${PROJECT_CODE}
+                -DPROJECT_ISSUES=${PROJECT_ISSUES}
+                -DPROJECT_VERSION=${OPEN3D_VERSION_FULL}
+                -DPROJECT_DESCRIPTION=${PROJECT_DESCRIPTION}
+                -DPROJECT_VERSION_THREE_NUMBER=${PROJECT_VERSION_THREE_NUMBER}
+                -DPYPI_PACKAGE_NAME=${PYPI_PACKAGE_NAME}
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/make_python_package.cmake
+        VERBATIM
+        DEPENDS ${GENERATED_OUTPUTS}
+    )
+else()
+    message(FATAL_ERROR "TBB::tbb target is not defined. Python package cannot be built.")
+endif()
 
 # Use `make pip-package` to create the pip package in the build directory
 add_custom_target(pip-package

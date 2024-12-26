@@ -11,7 +11,7 @@
 #endif
 #include "open3d/t/geometry/RaycastingScene.h"
 
-#ifdef BUILD_SYCL_MODULE
+#if BUILD_SYCL_MODULE
 #include <sycl/sycl.hpp>
 #endif
 // This header is in the embree src dir (embree/src/ext_embree/..).
