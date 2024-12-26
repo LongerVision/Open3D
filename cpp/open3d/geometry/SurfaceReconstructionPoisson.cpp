@@ -26,12 +26,14 @@
 // 4245: signed/unsigned mismatch
 // 4189: local variable is initialized but not referenced
 #endif
-#include "PoissonRecon/Src/PreProcessor.h"
-#include "PoissonRecon/Src/MyMiscellany.h"
-#include "PoissonRecon/Src/CmdLineParser.h"
-#include "PoissonRecon/Src/FEMTree.h"
-#include "PoissonRecon/Src/PPolynomial.h"
-#include "PoissonRecon/Src/PointStreamData.h"
+#include "PoissonRecon/PreProcessor.h"
+#include "PoissonRecon/MyMiscellany.h"
+#include "PoissonRecon/CmdLineParser.h"
+#include "PoissonRecon/FEMTree.h"
+#include "PoissonRecon/PPolynomial.h"
+#include "PoissonRecon/BSplineData.h"
+#include "PoissonRecon/PointExtent.h"
+#include "PoissonRecon/FEMTree.h"
 #ifdef _MSC_VER
 #pragma warning(pop)
 #endif
@@ -40,6 +42,8 @@
 namespace open3d {
 namespace geometry {
 namespace {
+
+    using namespace PoissonRecon;
 
 // The order of the B-Spline used to splat in data for color interpolation
 static const int DATA_DEGREE = 0;
@@ -84,8 +88,8 @@ public:
 };
 
 template <typename Real>
-class Open3DPointStream
-    : public InputPointStreamWithData<Real, DIMENSION, Open3DData> {
+class Open3DPointStream {
+//    : public InputPointStreamWithData<Real, DIMENSION, Open3DData> {
 public:
     Open3DPointStream(const open3d::geometry::PointCloud* pcd)
         : pcd_(pcd), xform_(nullptr), current_(0) {}
