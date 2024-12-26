@@ -5,6 +5,8 @@
 // SPDX-License-Identifier: MIT
 // ----------------------------------------------------------------------------
 
+#if BUILD_SYCL_MODULE
+
 #include <cstdlib>
 #include <sycl/sycl.hpp>
 #include <unordered_map>
@@ -67,3 +69,5 @@ void MemoryManagerSYCL::Memcpy(void* dst_ptr,
 
 }  // namespace core
 }  // namespace open3d
+
+#endif

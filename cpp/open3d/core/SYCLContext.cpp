@@ -6,6 +6,7 @@
 // ----------------------------------------------------------------------------
 
 #include "open3d/core/SYCLContext.h"
+#if BUILD_SYCL_MODULE
 
 #include <array>
 #include <cstdlib>
@@ -80,3 +81,5 @@ SYCLContext::SYCLContext() {
 }  // namespace sy
 }  // namespace core
 }  // namespace open3d
+
+#endif

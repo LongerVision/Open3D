@@ -14,6 +14,8 @@
 
 #pragma once
 
+#if BUILD_SYCL_MODULE
+
 #include <sycl/sycl.hpp>
 #include <unordered_map>
 
@@ -61,3 +63,5 @@ private:
 }  // namespace sy
 }  // namespace core
 }  // namespace open3d
+
+#endif  // BUILD_SYCL_MODULE
